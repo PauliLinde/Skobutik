@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
@@ -33,6 +34,8 @@ public class Repository {
                 shoe.setColor(rs.getString("färg"));
                 shoe.setPrice(rs.getDouble("pris"));
                 shoe.setBrand(rs.getString("märke"));
+                shoe.setShoePath("C:" + File.separator + "Users" + File.separator + "juspa" + File.separator + "Downloads" + File.separator + "Skor" + File.separator + shoe.getId() + ".jpg");
+                System.out.println(shoe.getShoePath());
                 shoes.add(shoe);
             }
         } catch (SQLException se) {
@@ -93,7 +96,8 @@ public class Repository {
         return orders;
     }
 
-    public void addShoeToCart(int customerId, int orderId, int shoeId) {
+    public String addShoeToCart(int customerId, int orderId, int shoeId) {
+        String message = "";
         try(Connection c = DriverManager.getConnection(
                 p.getProperty("connectionString"),
                 p.getProperty("name"),
@@ -102,12 +106,19 @@ public class Repository {
             CallableStatement cstmt = c.prepareCall("call skobutik.addToCart(?, ?, ?)");
 
             cstmt.setInt(1, customerId);
+            System.out.println(customerId);
             cstmt.setInt(2, orderId);
+            System.out.println(orderId);
             cstmt.setInt(3, shoeId);
+            System.out.println(shoeId);
             cstmt.executeQuery();
+
+            message = "Produkten tillagd";
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            message = e.getMessage();
         }
+        return message;
     }
 
 }

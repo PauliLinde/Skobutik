@@ -1,3 +1,4 @@
+import java.nio.file.Path;
 import java.util.List;
 
 public class Shoe {
@@ -6,17 +7,10 @@ public class Shoe {
     private String color;
     private double price;
     private String brand;
-    private List<Category> categories;
+    private String shoePath;
+
 
     public Shoe() {
-    }
-
-    public List<Category> getCategories() {
-        return categories;
-    }
-
-    public void setCategories(List<Category> categories) {
-        this.categories = categories;
     }
 
     public int getId() {
@@ -57,5 +51,13 @@ public class Shoe {
 
     public void setBrand(String brand) {
         this.brand = brand;
+    }
+
+    public String getShoePath() {
+        return shoePath;
+    }
+
+    public void setShoePath(String shoePath) {
+        this.shoePath = shoePath;
     }
 }
