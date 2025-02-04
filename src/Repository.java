@@ -35,7 +35,6 @@ public class Repository {
                 shoe.setPrice(rs.getDouble("pris"));
                 shoe.setBrand(rs.getString("märke"));
                 shoe.setShoePath("C:" + File.separator + "Users" + File.separator + "juspa" + File.separator + "Downloads" + File.separator + "Skor" + File.separator + shoe.getId() + ".jpg");
-                System.out.println(shoe.getShoePath());
                 shoes.add(shoe);
             }
         } catch (SQLException se) {
@@ -72,6 +71,28 @@ public class Repository {
         return customers;
     }
 
+    public int getOrderAmount(int orderId) {
+        int orderAmount = 0;
+        try (Connection c = DriverManager.getConnection(
+                p.getProperty("connectionString"),
+                p.getProperty("name"),
+                p.getProperty("password"));
+
+             PreparedStatement pstmt = c.prepareStatement("select sum(innehåll.antal) as sum from skobutik.innehåll where beställningsId=?");
+        ) {
+            pstmt.setInt(1, orderId);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                orderAmount = rs.getInt("sum");
+            }
+        } catch (SQLException se) {
+            se.printStackTrace();
+        }
+        return orderAmount;
+    }
+
     public List<Order> getOrder(){
         List<Order> orders = new ArrayList<>();
         try(Connection c = DriverManager.getConnection(
@@ -106,11 +127,8 @@ public class Repository {
             CallableStatement cstmt = c.prepareCall("call skobutik.addToCart(?, ?, ?)");
 
             cstmt.setInt(1, customerId);
-            System.out.println(customerId);
             cstmt.setInt(2, orderId);
-            System.out.println(orderId);
             cstmt.setInt(3, shoeId);
-            System.out.println(shoeId);
             cstmt.executeQuery();
 
             message = "Produkten tillagd";

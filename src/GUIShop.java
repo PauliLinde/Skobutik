@@ -17,6 +17,7 @@ public class GUIShop extends JFrame {
 
     private JPanel loginPanel = new JPanel();
     private JPanel shopPanel = new JPanel();
+    private JPanel southPanel = new JPanel();
 
     private JLabel usernameLabel = new JLabel("Användarnamn: ");
     private JTextField usernameField = new JTextField();
@@ -28,6 +29,7 @@ public class GUIShop extends JFrame {
 
     private JLabel messageLabel = new JLabel();
     private JButton moreItemsButton = new JButton("Lägg till fler");
+    private JLabel orderAmountLabel = new JLabel();
 
 
 
@@ -82,11 +84,11 @@ public class GUIShop extends JFrame {
     public boolean validateLogin(String username, String password){
         List<Customer> customerList = repo.getCustomers();
         for (Customer customer : customerList) {
-            if (customer.getName().equalsIgnoreCase(username) && customer.getPassword().equalsIgnoreCase(password)) {
+            if (customer.getName().equals(username) && customer.getPassword().equals(password)) {
                 logedInCustomer = customer;
                 List<Order> orderList = repo.getOrder();
                 for (Order order1 : orderList) {
-                    if(order1.getCustomer() == customer.getId()){
+                    if(order1.getCustomer() == customer.getId() && !order1.isPayedOrder()){
                         order=order1;
                         break;
                     }
@@ -99,14 +101,17 @@ public class GUIShop extends JFrame {
 
     public void theShoeShop(){
         getContentPane().removeAll();
+        shopPanel.removeAll();
         shopPanel.setLayout(new GridLayout(0,3));
         JScrollPane scrollPane = new JScrollPane(shopPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        add(scrollPane, BorderLayout.CENTER);
 
-        add(scrollPane);
+        orderAmountLabel.setText("Antal varor: " + repo.getOrderAmount(order.getId()));
+        add(orderAmountLabel, BorderLayout.NORTH);
+
         shoeList = repo.getShoes();
-        List<ShoeButton> shoeButtonList = new ArrayList<>();
         for (Shoe s : shoeList) {
             ImageIcon imageIcon;
             try {
@@ -133,27 +138,22 @@ public class GUIShop extends JFrame {
             shopPanel.add(shoeInfo);
             shopPanel.add(button);
             button.setPreferredSize(new Dimension(50, 5));
-            button.addActionListener(l -> addShoeToCart(s.getId()));
+            button.addActionListener(l -> {
+                addShoeToCart(s.getId());
+            });
         }
+        shopPanel.revalidate();
+        shopPanel.repaint();
         revalidate();
         repaint();
     }
 
-    /*public void findShoe(String buttonText){
-        for (Shoe s : shoeList) {
-            if(buttonText.contains(s.getBrand() + " " + s.getSize())){
-                shoe=s;
-            }
-        }
-        //addShoeToCart();
-    }*/
-
     public void addShoeToCart(int shoeId){
         String message = repo.addShoeToCart(logedInCustomer.getId(), order.getId(), shoeId);
-        shopPanel.removeAll();
+        orderAmountLabel.setText("Antal varor: " + repo.getOrderAmount(order.getId()));
         messageLabel.setText(message);
-        shopPanel.add(messageLabel);
-        shopPanel.add(moreItemsButton);
+        add(southPanel, BorderLayout.SOUTH);
+        southPanel.add(messageLabel); southPanel.add(moreItemsButton);
         moreItemsButton.addActionListener(l -> theShoeShop());
 
         revalidate();
