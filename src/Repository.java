@@ -52,7 +52,7 @@ public class Repository {
                 p.getProperty("password"));
 
             Statement stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery("select * from skobutik.kund inner join skobutik.beställning where kund.id=beställning.kundId");
+            ResultSet rs = stmt.executeQuery("select * from skobutik.kund");
         ){
             while(rs.next()) {
                 Customer customer = new Customer();
